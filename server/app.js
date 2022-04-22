@@ -1,6 +1,9 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 
 const app = express();
+
+app.use(bodyParser.json());
 
 app.use((req, res, next)=>{
     //this means no matter which domain sending request it is allowed to access server
@@ -31,6 +34,14 @@ app.get('/api/posts',(req, res)=>{
     res.status(200).json({
         message: "Posts received successfully",
         posts: posts
+    });
+});
+
+app.post('/api/posts',(req, res)=>{
+    const post = req.body;
+    console.log('*******Post Received', post);
+    res.status(201).json({
+        message:"Posts stored successfully"
     });
 });
 
