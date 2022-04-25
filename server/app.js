@@ -1,7 +1,22 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const Post = require('./models/post');
+const mongoose = require('mongoose');
 
 const app = express();
+
+mongoose.connect('mongodb://localhost:27017/MEANApp').
+  catch(error => handleError(error));
+
+async function run() {
+    try {
+            await mongoose.connect('mongodb://localhost:27017/MEANApp');
+        } catch (error) {
+              handleError(error);
+            }
+}
+
+run();
 
 app.use(bodyParser.json());
 
@@ -16,7 +31,7 @@ app.use((req, res, next)=>{
 });
 
 app.get('/api/posts',(req, res)=>{
-    const posts = [
+    /*const posts = [
         {
             title: "First Post from server",
             content: "First post content from server"
@@ -29,17 +44,25 @@ app.get('/api/posts',(req, res)=>{
             title: "Third Post from server",
             content: "Third post content from server"
         }
-    ]
+    ]*/
     //res.send("Hello from improved server!");
-    res.status(200).json({
-        message: "Posts received successfully",
-        posts: posts
+    Post.find().then(documents => {
+        res.status(200).json({
+            message: "Posts received successfully",
+            posts: documents
+        });
     });
+   
 });
 
 app.post('/api/posts',(req, res)=>{
-    const post = req.body;
+    //const post = req.body;
+    const post = new Post({
+        title: req.body.title,
+        content: req.body.content
+    });
     console.log('*******Post Received', post);
+    post.save();
     res.status(201).json({
         message:"Posts stored successfully"
     });
